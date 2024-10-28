@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Dynamic Table Row Addition</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h2>Table Row Addition</h2>
+
+    <table border="1" id="dynamicTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <br>
+
+    <form id="rowForm">
+        <input type="text" id="name" name="name" placeholder="Enter Name" required>
+        <input type="number" id="age" name="age" placeholder="Enter Age" required>
+        <button type="submit">Add Row</button>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: 'add_row.php',
+                method: 'GET',
+                success: function(response) {
+                    $('#dynamicTable tbody').html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.log('AJAX Error: ' + status + ' - ' + error);
+                }
+            });
+
+            $('#rowForm').submit(function(e) {
+                e.preventDefault();
+                
+                var name = $('#name').val();
+                var age = $('#age').val();
+
+                $.ajax({
+                    url: 'add_row.php',
+                    method: 'POST',
+                    data: { name: name, age: age },
+                    success: function(response) {
+                        if (response.trim() === 'success') {
+                            $('#dynamicTable tbody').append('<tr><td>' + name + '</td><td>' + age + '</td></tr>');
+                            $('#name').val('');
+                            $('#age').val('');
+                        } else {
+                            alert('Error adding row: ' + response);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('AJAX Error: ' + status + ' - ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
